@@ -4,7 +4,6 @@ import sys
 import argparse
 import inspect, os
 import os.path
-from nameparser import HumanName
 
 
 class ContactInfo():
@@ -72,96 +71,62 @@ def main():
     parser.add_argument('file', type=argparse.FileType('r'))
     args = parser.parse_args()
 
-    document = args.file.readlines()
+    # reading the file in reverse order to get the email, which will be used to get the name
+    document = reversed(args.file.readlines())
 
-    name = ""
-    phoneNumber = ""
-    email = ""
-    emailName = ""
+    nameInEmail = ""
 
     for line in document:
         # removing "\n" because it is annoying
         line.strip()
         line_parts = line.split()
-        #print line_parts
-
-        allInformation = ''.join(map(lambda x:x.lower(), line))
-        #print allInformation
-
 
         # checking to be sure it is a phone number and not a fax number
         if "Fax" not in line:
-            phoneNumberAsList = re.findall(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]', line)
-            phoneNumber = ''.join(phoneNumberAsList)
+            getPhoneNumber(line)
 
-            # checking to see if the contact card has a phone number
-            if phoneNumber:
-                # remove punctuation from phone number and format it
-                phoneNumber = 'Phone: ' + phoneNumber.translate(None, string.punctuation)
-                #print phoneNumber
-
-        # checking to see if the contact card has an email on it
+        # checking if there is an @ symbol in the line to get the email address
         if '@' in line:
-            emailAsList = re.findall('\S+@\S+', line)
-            email = ''.join(emailAsList)
+            email = getEmail(line)
 
-            if email:
-                email = email
-                #print email
+            # last name is always contained in email before @ symbol
+            # must get everything before @ and not use entire email address because company name is after email address
+            # and company name could also be a potental last name, so only want everything before @ symbol
+            nameInEmail = email.split('@')[0]
 
+        # getting the name of the person
+        getName(line, nameInEmail)
 
-                emailName = email.split('@')[0]
-                #print emailName
+def getPhoneNumber(line):
+        phoneNumberAsList = re.findall(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]', line)
+        phoneNumber = ''.join(phoneNumberAsList)
 
-        #if '@' not in line:
-        name = HumanName(allInformation)
-
-            #print name.last
-
-        if name.last not in emailName:
-            print 'no - ' + name.last
-        else:
-            print 'yes - ' + name.first
-
-    # for line in document:
-    #     allInformation = ''.join(map(lambda x:x.lower(), line))
-    #     name = HumanName(allInformation)
-    #     print allInformation
-    #     print name.last
-
-    #     # checking to be sure it is a phone number and not a fax number
-    #     if "Fax" not in line:
-    #         phoneNumberAsList = re.findall(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]', line)
-    #         phoneNumber = ''.join(phoneNumberAsList)
-
-    #         # checking to see if the contact card has a phone number
-    #         if phoneNumber:
-    #             # remove punctuation from phone number and format it
-    #             phoneNumber = 'Phone: ' + phoneNumber.translate(None, string.punctuation)
-    #             #print phoneNumber
-
-    #     # checking to see if the contact card has an email on it
-    #     if '@' in line:
-    #         emailAsList = re.findall('\S+@\S+', line)
-    #         email = ''.join(emailAsList)
-
-    #         if email:
-    #             email = 'Email: ' + email
-    #             #print email
-
-    #             #name = ''.join(map(lambda x:x.lower(), line))
-    #             #name = name.split('@')[0]
-
-    #             #print name
-    #     if name.last in email:
-    #         print name.last
+        # checking to see if the contact card has a phone number
+        if phoneNumber:
+            # remove punctuation from phone number and format it
+            phoneNumber = 'Phone: ' + phoneNumber.translate(None, string.punctuation)
+            return phoneNumber
 
 
+def getEmail(line):
+    emailAsList = re.findall('\S+@\S+', line)
+    email = ''.join(emailAsList)
 
-    #     lines = ''.join(map(lambda x:x.lower(), line))
-    #     #print lines
+    if email:
+        return email
 
+def getName(line, nameInEmail):
+    # getting the last word of each line, which is a potenntal last name
+    lastName = line.split()[-1]
 
+    # converting the characters in all of the potential last names to lowercase
+    lastName = ''.join(map(lambda x:x.lower(), lastName))
+
+    # checking one of the potental last names of a person is in the email address
+    if lastName not in nameInEmail:
+        print 'not in emailName - ' + lastName
+    else:
+        print 'yes in emailName - ' + lastName
 
 
 if (__name__ == "__main__" ):
