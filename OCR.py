@@ -5,6 +5,7 @@ import re
 import argparse
 
 class ContactInfo():
+    """a class to get the name, number, and email address from a given business card"""
     email = ""
     phoneNumber = ""
     name = ""
@@ -29,7 +30,10 @@ class ContactInfo():
 
 
 class BusinessCardParser():
+    """a class to parse the name, number, and email address from a given business card """
+
     def email_helper(self, line):
+        """helper function to find the line in the business card that contains the email address"""
         emailAsList = re.findall('\S+@\S+', line)
         email = ''.join(emailAsList)
 
@@ -39,6 +43,7 @@ class BusinessCardParser():
             return 'No email found'
 
     def phone_number_helper(self, line):
+        """helper function to find the line in the business card that contains the phone number"""
         phoneNumberAsList = re.findall(r'[\+\(]?[1-9][0-9 .\-\(\)]{8,}[0-9]', line)
         phoneNumber = ''.join(phoneNumberAsList)
 
@@ -52,6 +57,8 @@ class BusinessCardParser():
 
 
     def name_helper(self, line, nameInEmail):
+        """helper function to find the line in the business card that contains the name"""
+
         # getting the last word of each line, which is a potenntal last name
         lastName = line.split()[-1]
 
