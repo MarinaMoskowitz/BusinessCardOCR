@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import string
 import re
 import argparse
@@ -96,7 +98,7 @@ class BusinessCardParser():
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='A program to parse the name, phone number, and email from the given business card')
     parser.add_argument('file', type=argparse.FileType('r'))
     args = parser.parse_args()
 
