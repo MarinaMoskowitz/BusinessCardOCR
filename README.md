@@ -8,6 +8,7 @@ To run this program from the command line: ./OCR [file.txt]
 ex: ./OCR FoobarTechnologies
 
 ContactInfo Class: a class to get the name, number, and email address from a given business card
+
 BusinessCardParser: a class to parse the name, number, and email address from a given business card 
 
 
